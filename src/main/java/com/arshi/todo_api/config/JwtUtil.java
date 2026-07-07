@@ -2,16 +2,22 @@ package com.arshi.todo_api.config;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.util.Base64;
 import java.util.Date;
 
 @Component
 public class JwtUtil {
 
-    private final SecretKey secretKey = Keys.secretKeyFor(io.jsonwebtoken.SignatureAlgorithm.HS256);
+    private final SecretKey secretKey;
     private final long expirationMs = 1000 * 60 * 60; // 1 hour
+
+    public JwtUtil(@Value("${jwt.secret}") String secret) {
+        this.secretKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret));
+    }
 
     //Creates a new signed token containing the username, valid for 1 hour
     public String generateToken(String username) {
